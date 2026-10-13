@@ -28,10 +28,10 @@
 
     "testFramework": "phpunit",
 
-    // TYPO3 extensions keep the PHPUnit configuration under Tests/, and
-    // Infection looks for it next to its own config unless told otherwise.
+    // The unit configuration (phpunit.xml.dist) sits in the repository root;
+    // Tests/ only holds the functional one, which Infection must not pick up.
     "phpUnit": {
-        "configDir": "Tests"
+        "configDir": "."
     },
 
     "logs": {

@@ -33,6 +33,12 @@ final class StorageIntegrationTest extends FunctionalTestCase
 
     protected array $configurationToUseInTestInstance = [
         'EXTENSIONS' => ['koh_fal_s3' => ['fallbackProcessingFolder' => '1:/_processed_/_fallback_/']],
+        // The testing framework defaults to GraphicsMagick; the CI image carries ImageMagick 7.
+        'GFX' => [
+            'processor_enabled' => true,
+            'processor' => 'ImageMagick',
+            'processor_path' => '/usr/bin/',
+        ],
     ];
 
     private ?S3TestBucket $bucket = null;
