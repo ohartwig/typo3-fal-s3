@@ -34,11 +34,15 @@ final class S3ObjectStream implements SelfEmittableStreamInterface
     {
         if ($this->buffer !== '') {
             echo $this->buffer;
+            $this->position += strlen($this->buffer);
             $this->buffer = '';
         }
-        foreach ($this->iterator() as $chunk) {
+        $iterator = $this->iterator();
+        while ($iterator->valid()) {
+            $chunk = (string)$iterator->current();
             echo $chunk;
             $this->position += strlen($chunk);
+            $iterator->next();
         }
         $this->finished = true;
     }
@@ -129,8 +133,11 @@ final class S3ObjectStream implements SelfEmittableStreamInterface
     {
         $contents = $this->buffer;
         $this->buffer = '';
-        foreach ($this->iterator() as $chunk) {
-            $contents .= $chunk;
+        // Never foreach here: a generator that read() already advanced cannot be rewound.
+        $iterator = $this->iterator();
+        while ($iterator->valid()) {
+            $contents .= (string)$iterator->current();
+            $iterator->next();
         }
         $this->finished = true;
         $this->position += strlen($contents);
@@ -150,6 +157,7 @@ final class S3ObjectStream implements SelfEmittableStreamInterface
         if ($this->chunks === null) {
             $chunks = $this->output->getBody()->getChunks();
             $this->chunks = $chunks instanceof \Iterator ? $chunks : new \ArrayIterator(is_array($chunks) ? $chunks : iterator_to_array($chunks, false));
+            $this->chunks->rewind();
         }
         return $this->chunks;
     }
