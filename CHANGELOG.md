@@ -2,6 +2,12 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.0.2](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.1...v1.0.2) (2026-10-13)
+
+### :bug: Fixes
+
+* **deps:** update dependency php to ^8.5.11 ([309d6bb](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/309d6bb0625d39d2baa44271617e9c39a3489571))
+
 ## [1.0.1](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.0...v1.0.1) (2026-10-13)
 
 ### :bug: Fixes
