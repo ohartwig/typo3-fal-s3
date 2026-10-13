@@ -2,6 +2,17 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.0.1](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.0...v1.0.1) (2026-10-13)
+
+### :bug: Fixes
+
+* **deps:** update composer packages ([28660df](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/28660dffbeb2afb75fcd8f3544928eb672b4c855))
+
+### :repeat: Chores
+
+* **deps:** update dependency mstruebing/editorconfig-checker to v3.11.3 ([180d7a1](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/180d7a114f417262a05ed27bedd7f34985ab0476))
+* **deps:** update dependency davidanson/markdownlint-cli2 to v0.23.3 ([d53a15a](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/d53a15af0b6cad7c5e7d149f98f9479499efa141))
+
 ## [1.0.0] (2026-10-13)
 
 ### :sparkles: Features
