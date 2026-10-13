@@ -24,19 +24,19 @@
     },
     "require": {
         "php": "^8.5",
-        "async-aws/core": "^1.22",
-        "async-aws/s3": "^2.4",
-        "async-aws/simple-s3": "^2.1",
+        "async-aws/core": "^1.30.0",
+        "async-aws/s3": "^2.10.0",
+        "async-aws/simple-s3": "^2.1.1",
         "psr/http-message": "^1.1 || ^2.0",
-        "psr/log": "^3.0",
+        "psr/log": "^3.0.2",
         "symfony/http-client": "^7.3 || ^8.0",
         "typo3/cms-core": "^14.3"
     },
     "require-dev": {
-        "infection/infection": "^0.35.4",
-        "phpstan/phpstan": "^2.1",
+        "infection/infection": "^0.35.6",
+        "phpstan/phpstan": "^2.3.1",
         "phpunit/phpunit": "^12.0 || ^13.0",
-        "typo3/testing-framework": "^9.0"
+        "typo3/testing-framework": "^9.7.0"
     },
     "autoload": {
         "psr-4": {
