@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+SPDX-FileCopyrightText: 2026 Kai Ole Hartwig
+SPDX-License-Identifier: MIT
+-->
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="EXT:koh_fal_s3/Resources/Private/Language/locallang_db.xlf" date="2026-10-13T00:00:00Z" product-name="koh_fal_s3">
+        <header/>
+        <body>
+            <trans-unit id="driver.bucket" resname="driver.bucket">
+                <source>Bucket</source>
+            </trans-unit>
+            <trans-unit id="driver.bucket.description" resname="driver.bucket.description">
+                <source>Name of the S3 bucket. The environment variable KOH_FAL_S3_BUCKET overrides this value.</source>
+            </trans-unit>
+            <trans-unit id="driver.region" resname="driver.region">
+                <source>Region</source>
+            </trans-unit>
+            <trans-unit id="driver.region.description" resname="driver.region.description">
+                <source>AWS region of the bucket. Falls back to AWS_REGION, then eu-north-1.</source>
+            </trans-unit>
+            <trans-unit id="driver.endpoint" resname="driver.endpoint">
+                <source>Endpoint</source>
+            </trans-unit>
+            <trans-unit id="driver.endpoint.description" resname="driver.endpoint.description">
+                <source>Leave empty for AWS. Set for S3-compatible storage such as MinIO (for example http://minio:9000).</source>
+            </trans-unit>
+            <trans-unit id="driver.pathStyle" resname="driver.pathStyle">
+                <source>Path-style addressing (MinIO)</source>
+            </trans-unit>
+            <trans-unit id="driver.keyPrefix" resname="driver.keyPrefix">
+                <source>Key prefix</source>
+            </trans-unit>
+            <trans-unit id="driver.keyPrefix.description" resname="driver.keyPrefix.description">
+                <source>Optional prefix inside the bucket that acts as the storage root. Leave empty when the bucket root is the storage root.</source>
+            </trans-unit>
+            <trans-unit id="driver.publicBaseUri" resname="driver.publicBaseUri">
+                <source>Public base URI</source>
+            </trans-unit>
+            <trans-unit id="driver.publicBaseUri.description" resname="driver.publicBaseUri.description">
+                <source>Where the web server serves the bucket, e.g. /fileadmin/. Public URLs are this base plus the file identifier. Uncheck "Is public?" on the storage to deliver through TYPO3 instead.</source>
+            </trans-unit>
+            <trans-unit id="driver.excludedPrefixes" resname="driver.excludedPrefixes">
+                <source>Excluded prefixes</source>
+            </trans-unit>
+            <trans-unit id="driver.excludedPrefixes.description" resname="driver.excludedPrefixes.description">
+                <source>One per line. Prefixes other systems own in the same bucket; hidden from listings and refused for writes. Default: _typo3temp-assets/, pos-exchange/, malware-protection-resource-validation-object.</source>
+            </trans-unit>
+            <trans-unit id="driver.cacheControlDefault" resname="driver.cacheControlDefault">
+                <source>Cache-Control for files</source>
+            </trans-unit>
+            <trans-unit id="driver.cacheControlProcessed" resname="driver.cacheControlProcessed">
+                <source>Cache-Control for processed files</source>
+            </trans-unit>
+            <trans-unit id="driver.conditionalWrites" resname="driver.conditionalWrites">
+                <source>Conditional writes</source>
+            </trans-unit>
+            <trans-unit id="driver.conditionalWrites.description" resname="driver.conditionalWrites.description">
+                <source>Create objects with If-None-Match so two replicas never overwrite each other. Disable only for S3-compatible storage that lacks conditional writes.</source>
+            </trans-unit>
+            <trans-unit id="driver.streamMode" resname="driver.streamMode">
+                <source>Streaming for non-public files</source>
+            </trans-unit>
+            <trans-unit id="driver.streamMode.description" resname="driver.streamMode.description">
+                <source>How TYPO3 delivers files when the storage is not public: stream through PHP, or redirect to a presigned S3 URL.</source>
+            </trans-unit>
+            <trans-unit id="driver.streamMode.proxy" resname="driver.streamMode.proxy">
+                <source>Stream through TYPO3</source>
+            </trans-unit>
+            <trans-unit id="driver.streamMode.redirect" resname="driver.streamMode.redirect">
+                <source>Redirect to a presigned URL</source>
+            </trans-unit>
+            <trans-unit id="driver.presignLifetime" resname="driver.presignLifetime">
+                <source>Presigned URL lifetime (seconds)</source>
+            </trans-unit>
+            <trans-unit id="driver.malwareGate" resname="driver.malwareGate">
+                <source>Refuse objects GuardDuty flagged as malware</source>
+            </trans-unit>
+            <trans-unit id="driver.malwareGate.description" resname="driver.malwareGate.description">
+                <source>Reads the GuardDutyMalwareScanStatus tag (one request per object version, cached). Objects tagged THREATS_FOUND get no public URL and are not delivered.</source>
+            </trans-unit>
+            <trans-unit id="driver.maxFolderOperationObjects" resname="driver.maxFolderOperationObjects">
+                <source>Maximum objects per folder move/copy/delete</source>
+            </trans-unit>
+            <trans-unit id="driver.caseSensitive" resname="driver.caseSensitive">
+                <source>Case-sensitive identifiers</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

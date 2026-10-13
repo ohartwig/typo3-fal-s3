@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: 2026 Kai Ole Hartwig
+# SPDX-License-Identifier: MIT
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  Koh\FalS3\:
+    resource: '../Classes/*'
+    # The driver and its runtime are built by TYPO3 with makeInstance($class, $configuration)
+    # and by DriverRuntimeFactory; value objects and exceptions are not services.
+    exclude:
+      - '../Classes/Driver/*'
+      - '../Classes/Exception/*'
+      - '../Classes/Http/*'
+      - '../Classes/Cache/*'
+      - '../Classes/Security/*'
+      - '../Classes/Metrics/*'
+      - '../Classes/S3/*'
+      - '../Classes/Configuration/DriverConfiguration.php'
+
+  # Fetched with makeInstance() from inside the driver: public, so the container's
+  # shared instance (and its S3 client memo) is what comes back.
+  Koh\FalS3\Driver\DriverRuntimeFactory:
+    public: true
+
+  Koh\FalS3\Configuration\ConfigurationResolver:
+    public: true
