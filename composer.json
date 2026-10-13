@@ -1,0 +1,76 @@
+{
+    "name": "koh/typo3-fal-s3",
+    "description": "TYPO3 FAL driver for Amazon S3: media without a FUSE mount, one IAM role per tenant via web identity, public URLs unchanged, a persistent metadata cache so S3 is asked once.",
+    "type": "typo3-cms-extension",
+    "license": "MIT",
+    "keywords": [
+        "TYPO3",
+        "extension",
+        "fal",
+        "s3",
+        "aws",
+        "storage"
+    ],
+    "authors": [
+        {
+            "name": "Kai Ole Hartwig",
+            "email": "mail@ole-hartwig.eu"
+        }
+    ],
+    "homepage": "https://ole-hartwig.eu/open-source",
+    "support": {
+        "issues": "https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/-/issues",
+        "source": "https://github.com/ole-hartwig/typo3-fal-s3"
+    },
+    "require": {
+        "php": "^8.5",
+        "async-aws/core": "^1.22",
+        "async-aws/s3": "^2.4",
+        "async-aws/simple-s3": "^2.1",
+        "psr/http-message": "^1.1 || ^2.0",
+        "psr/log": "^3.0",
+        "symfony/http-client": "^7.3 || ^8.0",
+        "typo3/cms-core": "^14.3"
+    },
+    "require-dev": {
+        "infection/infection": "^0.35.4",
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^12.0 || ^13.0",
+        "typo3/testing-framework": "^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Koh\\FalS3\\": "Classes/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Koh\\FalS3\\Tests\\": "Tests/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://git.ole-hartwig.eu/api/v4/group/1091/-/packages/composer/packages.json",
+            "only": [
+                "koh/*"
+            ]
+        }
+    ],
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "koh_fal_s3"
+        },
+        "branch-alias": {
+            "dev-main": "1.0-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "typo3/class-alias-loader": true,
+            "typo3/cms-composer-installers": true,
+            "infection/extension-installer": true
+        }
+    }
+}

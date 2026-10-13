@@ -1,0 +1,52 @@
+{
+    // Canonical Infection configuration.
+    //
+    // This file belongs in the REPOSITORY ROOT. Infection has no config
+    // inheritance and treats the directory holding this file as the project
+    // root — it looks for phpunit.xml next to it — so referencing a shared copy
+    // from vendor/ does not work. That is also why there is no `extends` here.
+    //
+    // In CI the file is optional: test-tools/test-infection generates an
+    // equivalent configuration from the composer.json PSR-4 map when the
+    // repository carries none. Commit it only when the generated default is
+    // wrong for the layout.
+    "$schema": "vendor/infection/infection/resources/schema.json",
+
+    "source": {
+        // TYPO3 extension layout. See infection.json5 for the rationale behind every
+        // other setting; only this directory differs.
+        "directories": [
+            "Classes"
+        ],
+        // Excluded on purpose: test doubles and fixtures carry no logic whose
+        // mutation would say anything, and generated code is not ours to fix.
+        "excludes": [
+            "*/Tests/*",
+            "*/Fixtures/*"
+        ]
+    },
+
+    "testFramework": "phpunit",
+
+    // TYPO3 extensions keep the PHPUnit configuration under Tests/, and
+    // Infection looks for it next to its own config unless told otherwise.
+    "phpUnit": {
+        "configDir": "Tests"
+    },
+
+    "logs": {
+        "text": "var/infection/infection.log",
+        "html": "var/infection/infection.html",
+        "summary": "var/infection/summary.log"
+    },
+
+    "mutators": {
+        "@default": true
+    }
+
+    // Thresholds are deliberately absent. The CI component passes --min-msi and
+    // --min-covered-msi on the command line, so the policy lives in one place
+    // (devops/ci-cd-components/test-tools) rather than drifting across every
+    // repository that keeps a copy of this file. A local run without thresholds
+    // reports instead of failing, which is what you want while exploring.
+}

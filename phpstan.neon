@@ -1,0 +1,7 @@
+parameters:
+    level: max
+    paths:
+        - Classes
+        - Tests
+    excludePaths:
+        - Tests/Functional/Fixtures
