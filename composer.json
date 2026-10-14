@@ -19,8 +19,9 @@
     ],
     "homepage": "https://ole-hartwig.eu/open-source",
     "support": {
-        "issues": "https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/-/issues",
-        "source": "https://github.com/ole-hartwig/typo3-fal-s3"
+        "issues": "https://github.com/ohartwig/typo3-fal-s3/issues",
+        "source": "https://github.com/ohartwig/typo3-fal-s3",
+        "security": "https://github.com/ohartwig/typo3-fal-s3/blob/main/SECURITY.md"
     },
     "require": {
         "php": "^8.5.11",
