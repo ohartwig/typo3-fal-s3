@@ -2,6 +2,12 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.0.3](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.2...v1.0.3) (2026-10-14)
+
+### :repeat: Chores
+
+* **repo-templates:** sync ([0463bb6](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/0463bb64f0d06254475a0808a00827b0d6dde2c7))
+
 ## [1.0.2](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.1...v1.0.2) (2026-10-13)
 
 ### :bug: Fixes
