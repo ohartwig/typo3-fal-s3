@@ -2,6 +2,18 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.0.5](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.4...v1.0.5) (2026-10-15)
+
+### :repeat: Continuous Integrations
+
+* drop the TER publish, Packagist is enough ([e043870](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/e04387019852db95fb4b069cf4e6f8ed0fc95502))
+* publish releases to the TYPO3 Extension Repository ([ec7aee8](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/ec7aee8c76422942c657661d133c1540c885a391))
+* **deps:** pin registry.ole-hartwig.eu/devops/ci-mirrors/rustfs docker tag to 1803fae ([15f3b7f](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/15f3b7fd418628ef5804309fdab34080bca3abb8))
+
+### :repeat: Chores
+
+* **deps:** update dependency infection/infection to ^0.35.8 ([8468a33](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/8468a33541d0bd3e28dc0ee1266107407501784c))
+
 ## [1.0.4](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.3...v1.0.4) (2026-10-14)
 
 ### :bug: Fixes
