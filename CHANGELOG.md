@@ -2,6 +2,12 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.0.7](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.6...v1.0.7) (2026-10-18)
+
+### :bug: Fixes
+
+* admit PHP 8.3 and test the floor on it ([94c65a1](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/94c65a1ca394b69048555d773009fe039dff6b04))
+
 ## [1.0.6](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.5...v1.0.6) (2026-10-16)
 
 ### :repeat: Chores
