@@ -40,7 +40,7 @@ URL.
   frontend depends on a pod-local `typo3temp/assets` anymore.
 
 Built on [`async-aws/s3`](https://async-aws.com) (Symfony HTTP client, no Guzzle
-version coupling, presigning included). Requires TYPO3 ^14.3 and PHP ^8.5.
+version coupling, presigning included). Requires TYPO3 ^14.3 and PHP ^8.3.
 
 ## Install
 

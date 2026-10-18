@@ -17,6 +17,7 @@ path = [
     ".markdownlint-cli2.jsonc",
     ".mise.toml",
     "composer.json",
+    "renovate.json",
     "infection.json5",
     "lefthook.yml",
     "phpstan.neon",

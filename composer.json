@@ -24,7 +24,7 @@
         "security": "https://github.com/ohartwig/typo3-fal-s3/blob/main/SECURITY.md"
     },
     "require": {
-        "php": "^8.5.11",
+        "php": "^8.3",
         "async-aws/core": "^1.30.0",
         "async-aws/s3": "^2.10.0",
         "async-aws/simple-s3": "^2.1.1",
