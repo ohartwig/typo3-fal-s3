@@ -2,6 +2,18 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.0.8](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.7...v1.0.8) (2026-10-25)
+
+### :repeat: Continuous Integrations
+
+* **deps:** update registry.ole-hartwig.eu/devops/ci-mirrors/rustfs docker tag to v1.0.3 ([614615f](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/614615f5e89dbb2ec092684cf89a818f42d4eb11))
+* **deps:** update registry.ole-hartwig.eu/devops/ci-mirrors/rustfs docker tag to v1.0.2 ([142040a](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/142040a9859c1d5f019c3464525fc2df94a64fa4))
+
+### :repeat: Chores
+
+* **deps:** update dependency phpstan/phpstan to ^2.3.2 ([c49b2f2](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/c49b2f260aaec4e817758fc01510f33e0b603f38))
+* **repo-templates:** sync ([fc63d5f](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/fc63d5fc07617ca49bef16d6d970687cc76f4f37))
+
 ## [1.0.7](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.6...v1.0.7) (2026-10-18)
 
 ### :bug: Fixes
