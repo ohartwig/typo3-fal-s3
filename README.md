@@ -31,7 +31,9 @@ URL.
   succeed; a real name collision is an `ExistingTargetFileNameException`.
 - **Shared buckets are fine.** `excludedPrefixes` hides what other systems
   keep in the same bucket (defaults: `_typo3temp-assets/`, `pos-exchange/`, the
-  GuardDuty probe object) from listings and refuses writes there.
+  GuardDuty probe object) from listings and refuses writes there. This holds
+  inside TYPO3 only: whatever serves `/fileadmin/` from the bucket must refuse
+  the same prefixes itself (see Delivery).
 - **Processed variants land in the bucket** with `Cache-Control: … immutable`
   and the correct `Content-Type`; originals get a shorter TTL. Both are
   configurable.

@@ -128,6 +128,74 @@ final class S3DriverStreamingAndGateTest extends FunctionalTestCase
         $driver->getFileForLocalProcessing('/evil.txt', false);
     }
 
+    /**
+     * AUD-059-F02 / I-651: the read paths outside streamFile and local processing
+     * must refuse a flagged object as well.
+     */
+    #[Test]
+    public function malwareGateAlsoGuardsContentDumpAndHashReads(): void
+    {
+        $driver = $this->driver(['malwareGate' => '1']);
+        $driver->addFile($this->localFile('evil'), '/', 'evil.txt');
+        $bucket = $this->bucket();
+        $bucket->client()->putObjectTagging([
+            'Bucket' => $bucket->name,
+            'Key' => 'evil.txt',
+            'Tagging' => ['TagSet' => [['Key' => MalwareScanGate::TAG, 'Value' => MalwareScanGate::THREATS_FOUND]]],
+        ])->resolve();
+
+        self::assertSame(403, $driver->streamFile('/evil.txt', [])->getStatusCode());
+        foreach (['getFileContents' => fn() => $driver->getFileContents('/evil.txt'),
+            'dumpFileContents' => fn() => $driver->dumpFileContents('/evil.txt'),
+            'hash' => fn() => $driver->hash('/evil.txt', 'sha1')] as $name => $read) {
+            ob_start();
+            try {
+                $read();
+                self::fail($name . ' returned a flagged object');
+            } catch (ThreatsFoundException) {
+                // expected
+            } finally {
+                self::assertSame('', (string)ob_get_clean(), $name . ' must not emit content');
+            }
+        }
+    }
+
+    /**
+     * AUD-059-F02 / I-651: dumpFileContents honours the excluded prefixes like streamFile.
+     */
+    #[Test]
+    public function dumpFileContentsHidesExcludedPrefixes(): void
+    {
+        $driver = $this->driver([]);
+        $bucket = $this->bucket();
+        $bucket->client()->putObject(['Bucket' => $bucket->name, 'Key' => 'pos-exchange/x.csv', 'Body' => 'secret'])->resolve();
+        ob_start();
+        $driver->dumpFileContents('/pos-exchange/x.csv');
+        self::assertSame('', (string)ob_get_clean());
+    }
+
+    /**
+     * AUD-059-F02 / I-651: a verdict read for a replaced object is not stored under the old ETag.
+     */
+    #[Test]
+    public function verdictOfAReplacedObjectIsNotCachedUnderTheStaleEtag(): void
+    {
+        $driver = $this->driver(['malwareGate' => '1']);
+        $driver->addFile($this->localFile('v1'), '/', 'swap.txt');
+        $bucket = $this->bucket();
+        // Replaced behind the driver's back and flagged; the driver still holds the old ETag.
+        $bucket->client()->putObject(['Bucket' => $bucket->name, 'Key' => 'swap.txt', 'Body' => 'v2-evil'])->resolve();
+        $bucket->client()->putObjectTagging([
+            'Bucket' => $bucket->name,
+            'Key' => 'swap.txt',
+            'Tagging' => ['TagSet' => [['Key' => MalwareScanGate::TAG, 'Value' => MalwareScanGate::THREATS_FOUND]]],
+        ])->resolve();
+        $before = $driver->getRequestCounter()->snapshot()['requests']['GetObjectTagging'] ?? 0;
+        $driver->getPublicUrl('/swap.txt');
+        $driver->getPublicUrl('/swap.txt');
+        self::assertSame($before + 2, $driver->getRequestCounter()->snapshot()['requests']['GetObjectTagging'] ?? 0, 'a verdict for another version is not cached under the old ETag');
+    }
+
     #[Test]
     public function unscannedObjectsAreNotBlocked(): void
     {

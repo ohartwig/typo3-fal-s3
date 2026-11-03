@@ -569,6 +569,9 @@ class S3Driver extends AbstractHierarchicalFilesystemDriver implements Streamabl
         if (!$metadata->exists) {
             throw new \InvalidArgumentException('File ' . $fileIdentifier . ' does not exist.', 1314516809);
         }
+        if ($runtime->malwareGate->isBlocked($key, $metadata->etag)) {
+            throw new ThreatsFoundException($fileIdentifier);
+        }
         $etag = $metadata->etagKey();
         $cached = $runtime->cache->hash($key, $etag, $hashAlgorithm);
         if ($cached !== null) {
@@ -599,8 +602,12 @@ class S3Driver extends AbstractHierarchicalFilesystemDriver implements Streamabl
         if ($runtime->mapper->isExcluded($fileIdentifier)) {
             return '';
         }
+        $key = $runtime->mapper->fileKey($fileIdentifier);
+        if ($runtime->malwareGate->isEnabled() && $runtime->malwareGate->isBlocked($key, $this->metadata($key)->etag)) {
+            throw new ThreatsFoundException($fileIdentifier);
+        }
         try {
-            return $runtime->store->get($runtime->mapper->fileKey($fileIdentifier))->getBody()->getContentAsString();
+            return $runtime->store->get($key)->getBody()->getContentAsString();
         } catch (FileDoesNotExistException) {
             return '';
         }
@@ -657,7 +664,21 @@ class S3Driver extends AbstractHierarchicalFilesystemDriver implements Streamabl
     {
         $identifier = $this->canonicalizeAndCheckFileIdentifier($identifier);
         $runtime = $this->runtime();
-        $output = $runtime->store->get($runtime->mapper->fileKey($identifier));
+        if ($runtime->mapper->isExcluded($identifier)) {
+            return;
+        }
+        $key = $runtime->mapper->fileKey($identifier);
+        $metadata = $this->metadata($key);
+        if (!$metadata->exists) {
+            return;
+        }
+        if ($metadata->archived) {
+            throw new ObjectArchivedException($key, $metadata->storageClass);
+        }
+        if ($runtime->malwareGate->isBlocked($key, $metadata->etag)) {
+            throw new ThreatsFoundException($identifier);
+        }
+        $output = $runtime->store->get($key);
         foreach ($output->getBody()->getChunks() as $chunk) {
             echo $chunk;
         }
