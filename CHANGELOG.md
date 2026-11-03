@@ -2,6 +2,12 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.0.11](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.10...v1.0.11) (2026-11-03)
+
+### :bug: Fixes
+
+* **security:** AUD-059 F01 F02 — gate every read path, document delivery limits ([05c4a7e](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/05c4a7eecd0c693058793cf206269bfbb12d4ba6))
+
 ## [1.0.10](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.9...v1.0.10) (2026-10-30)
 
 ### :repeat: Chores
