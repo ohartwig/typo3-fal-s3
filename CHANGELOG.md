@@ -2,6 +2,17 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.0.13](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.11...v1.0.13) (2026-11-06)
+
+### :repeat: Chores
+
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.138-8.5 ([bea2168](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/bea2168c73ee057d994b2ee1e2a2d1f71d07b0e2))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.137-8.5 ([4a92544](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/4a92544d077de082179e7d268713899975310c84))
+* **deps:** update dependency phpstan/phpstan to ^2.3.5 ([32fe71b](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/32fe71b1017a593f1bb24b174afe4eec70ddfd99))
+* **deps:** update dependency infection/infection to ^0.35.9 ([5ec76ae](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/5ec76ae0a8746837c69265af17259adbe61e7509))
+* **repo-templates:** sync ([b49f2ca](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/b49f2cafa295f3459662226cb5655b04ea5b742b))
+* **repo-templates:** sync ([dfd2265](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/dfd2265da7708d8d30d13a4ab13c4019600a5885))
+
 ## [1.0.12](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.11...v1.0.12) (2026-11-06)
 
 ### :repeat: Chores
