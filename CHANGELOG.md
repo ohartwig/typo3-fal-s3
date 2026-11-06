@@ -2,6 +2,15 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.0.12](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.11...v1.0.12) (2026-11-06)
+
+### :repeat: Chores
+
+* **deps:** update dependency phpstan/phpstan to ^2.3.5 ([32fe71b](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/32fe71b1017a593f1bb24b174afe4eec70ddfd99))
+* **deps:** update dependency infection/infection to ^0.35.9 ([5ec76ae](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/5ec76ae0a8746837c69265af17259adbe61e7509))
+* **repo-templates:** sync ([b49f2ca](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/b49f2cafa295f3459662226cb5655b04ea5b742b))
+* **repo-templates:** sync ([dfd2265](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/dfd2265da7708d8d30d13a4ab13c4019600a5885))
+
 ## [1.0.11](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.10...v1.0.11) (2026-11-03)
 
 ### :bug: Fixes
