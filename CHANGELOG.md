@@ -2,6 +2,30 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.0.14](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.13...v1.0.14) (2026-11-07)
+
+### :bug: Fixes
+
+* finish per-request state at the end of each request in worker servers ([eb14dd6](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/eb14dd6a049dab02c77b49c98c4c9df7d682fe27))
+
+### :white_check_mark: Tests
+
+* cover the shutdown fallback and the reset after a flush ([b298357](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/b2983576aad56ef7f89a105264d7641e2ba5c7c9))
+
+### :repeat: Chores
+
+* **repo-templates:** sync ([f15944d](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/f15944d21ef5ee3f40c2b6a59f01c66cf9c0bb3d))
+* **repo-templates:** sync ([2a78496](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/2a7849651bbfa5fd895baa877b3670e6ef79f0aa))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.150-8.5 ([8fe4c12](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/8fe4c1204dfe8361680e9b2f9998cc30b6359e56))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.149-8.5 ([7a91800](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/7a918002f5aa6dd79cfd8a9445323ea13976eb9b))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.148-8.5 ([da71cce](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/da71ccec2d50ca12ba314338541cd9a7e40d9ded))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.147-8.5 ([a811cb2](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/a811cb2b930aa48f9b8c6b6240f765d5cb1e8507))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.146-8.5 ([cc1ea39](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/cc1ea391a24e21b2cb06a2ca4a5e3640d3598c60))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.144-8.5 ([ceec1d2](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/ceec1d21e909901015736e91692e19a7da8b53ca))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.143-8.5 ([f1efaea](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/f1efaea74ea33defb67348a62afa4199d11af6bc))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.142-8.5 ([c748ab1](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/c748ab1f2e5465cd83b6ff268e2227478cb00fd4))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.139-8.5 ([c9b6243](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/c9b624315555e590f2d7655119e1721c4e6fa1d2))
+
 ## [1.0.13](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.11...v1.0.13) (2026-11-06)
 
 ### :repeat: Chores
