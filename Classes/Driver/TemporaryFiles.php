@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Koh\FalS3\Driver;
 
+use Koh\FalS3\Runtime\EndOfRequest;
+use Koh\FalS3\Runtime\Finishable;
 use Koh\FalS3\S3\ObjectStore;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -17,9 +19,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * the original of every variant it renders, so one download per
  * (key, etag) per request is shared between read-only callers; a writable
  * caller gets its own copy because it may hand the path to addFile() with
- * removeOriginal. Everything is unlinked at shutdown.
+ * removeOriginal. Everything is unlinked when the request's driver objects go
+ * away (see EndOfRequest): in a worker server at the end of each request, not
+ * after hundreds of requests when the worker exits.
  */
-final class TemporaryFiles
+final class TemporaryFiles implements Finishable
 {
     /** @var array<string, non-empty-string> */
     private array $shared = [];
@@ -64,6 +68,16 @@ final class TemporaryFiles
         $this->shared = [];
     }
 
+    public function finish(): void
+    {
+        $this->cleanup();
+    }
+
+    public function __destruct()
+    {
+        $this->cleanup();
+    }
+
     /**
      * @return non-empty-string
      */
@@ -73,7 +87,7 @@ final class TemporaryFiles
         $this->created[] = $path;
         if (!$this->registered) {
             $this->registered = true;
-            register_shutdown_function($this->cleanup(...));
+            EndOfRequest::register($this);
         }
         return $path;
     }

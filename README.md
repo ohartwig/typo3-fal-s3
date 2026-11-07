@@ -133,8 +133,13 @@ the same way with `publicBaseUri` pointing at it.
 
 ## Metrics
 
-Every process writes one `info` line to the log channel `Koh.FalS3.Metrics`
-with the S3 requests it made per operation and the cache hit/miss count. Route
+Every request that reached S3 writes one `info` line ("S3 requests for this
+request") to the log channel `Koh.FalS3.Metrics`, with the S3 requests per
+operation and the cache hit/miss count. For `GetObject` and `HeadObject` it also
+lists the object keys (up to 25 per operation, `keys_dropped` counts the rest),
+so a slow render can be traced to the files it fetched. The line is written when
+the request's driver objects go away, which in a worker server (FrankenPHP,
+RoadRunner) is the end of each request, not the end of the worker process. Route
 it to a file or JSON writer to compare request volume with whatever the storage
 replaced:
 

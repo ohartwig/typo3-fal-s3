@@ -53,7 +53,7 @@ class ObjectStore
 
     public function head(string $key): ObjectMetadata
     {
-        $this->counter->request('HeadObject');
+        $this->counter->request('HeadObject', $key);
         try {
             $output = $this->client->headObject(['Bucket' => $this->bucket, 'Key' => $key]);
             $output->resolve();
@@ -137,7 +137,7 @@ class ObjectStore
      */
     public function get(string $key, ?string $range = null): GetObjectOutput
     {
-        $this->counter->request('GetObject');
+        $this->counter->request('GetObject', $key);
         $input = ['Bucket' => $this->bucket, 'Key' => $key];
         if ($range !== null) {
             $input['Range'] = $range;
