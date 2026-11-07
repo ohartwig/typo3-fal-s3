@@ -50,9 +50,35 @@ final class EndOfRequestTest extends UnitTestCase
         $counter->request('HeadObject', 'a.jpg');
 
         EndOfRequest::finishAll();
-        unset($counter);
+        self::assertCount(1, $logger->records, 'the shutdown fallback flushes objects that are still alive');
 
-        self::assertCount(1, $logger->records);
+        unset($counter);
+        self::assertCount(1, $logger->records, 'and the destructor does not log the same counts again');
+    }
+
+    #[Test]
+    public function aFlushStartsTheNextLineFromZero(): void
+    {
+        $logger = $this->recordingLogger();
+        $counter = new RequestCounter($logger, 'bucket');
+        for ($i = 0; $i <= RequestCounter::KEY_LIMIT; $i++) {
+            $counter->request('GetObject', 'k' . $i);
+        }
+        $counter->cacheHit();
+        $counter->cacheMiss();
+
+        $counter->finish();
+        $counter->request('HeadObject', 'x');
+
+        self::assertSame([
+            'bucket' => 'bucket',
+            'requests' => ['HeadObject' => 1],
+            'total' => 1,
+            'cache_hits' => 0,
+            'cache_misses' => 0,
+            'keys' => ['HeadObject' => ['x' => 1]],
+            'keys_dropped' => 0,
+        ], $counter->snapshot());
     }
 
     #[Test]
@@ -90,15 +116,21 @@ final class EndOfRequestTest extends UnitTestCase
     #[Test]
     public function temporaryFilesAreRemovedWhenTheirRequestEnds(): void
     {
+        $before = EndOfRequest::pendingCount();
         $files = new TemporaryFiles($this->storeWritingTo());
         $shared = $files->materialise('a.jpg', 'etag', 'jpg', false);
         $copy = $files->materialise('a.jpg', 'etag', 'jpg', true);
         self::assertFileExists($shared);
         self::assertFileExists($copy);
+        self::assertSame($before + 1, EndOfRequest::pendingCount(), 'registered once for the shutdown fallback');
 
+        EndOfRequest::finishAll();
+        self::assertFileDoesNotExist($shared, 'the shutdown fallback removes the files of live objects');
+
+        $again = $files->materialise('a.jpg', 'etag', 'jpg', false);
         unset($files);
 
-        self::assertFileDoesNotExist($shared);
+        self::assertFileDoesNotExist($again);
         self::assertFileDoesNotExist($copy);
     }
 

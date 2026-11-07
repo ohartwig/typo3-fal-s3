@@ -79,7 +79,7 @@ final class RequestCounter implements Finishable
         ];
     }
 
-    public function flush(): void
+    private function flush(): void
     {
         if ($this->requests === []) {
             return;
