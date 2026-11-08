@@ -2,6 +2,12 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.0.15](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.14...v1.0.15) (2026-11-08)
+
+### :bug: Fixes
+
+* register S3 image variants without downloading them ([1542a2b](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/1542a2bf7259f00c5dcbd44afca7235cdc94e1d9))
+
 ## [1.0.14](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.13...v1.0.14) (2026-11-07)
 
 ### :bug: Fixes
