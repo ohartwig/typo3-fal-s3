@@ -131,6 +131,20 @@ application's Caddy, under the same web-identity role, with `Cache-Control`
 rules keyed on `/fileadmin/_processed_/*`. A CDN in front of the bucket works
 the same way with `publicBaseUri` pointing at it.
 
+## Image rendering
+
+After processing an image, Extbase's `ImageService` (behind Fluid's `f:image`
+and `f:uri.image`) registers the variant with the `AssetCollector` and, to do
+so, asks for a local copy of it. On a local storage that is a path; on S3 it is
+a full download of every variant in every uncached render, although the copy is
+never read. The extension replaces the service through XCLASS with one that
+registers variants in an S3 storage from the values TYPO3 already has (width,
+height, public URL) and leaves other storages to the core. A site that has its
+own XCLASS for `ImageService` keeps it and does not get this.
+
+`IMAGE` and `IMG_RESOURCE` in TypoScript go through
+`ContentObjectRenderer::getImgResource()`, which still fetches the variant.
+
 ## Metrics
 
 Every request that reached S3 writes one `info` line ("S3 requests for this

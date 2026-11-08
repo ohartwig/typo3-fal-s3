@@ -9,8 +9,10 @@ declare(strict_types=1);
 
 use Koh\FalS3\Driver\DriverRuntimeFactory;
 use Koh\FalS3\Driver\S3Driver;
+use Koh\FalS3\Imaging\ImageService;
 use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
 use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
+use TYPO3\CMS\Extbase\Service\ImageService as ExtbaseImageService;
 
 defined('TYPO3') or die();
 
@@ -34,3 +36,9 @@ $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][DriverRunti
     'options' => ['defaultLifetime' => 86400],
     'groups' => ['system'],
 ];
+
+// Extbase's ImageService downloads every processed image to register it with the
+// AssetCollector; ours skips that for S3 storages (Classes/Imaging/ImageService.php).
+// Extbase builds the service in its ServiceProvider, which honours XCLASS but not a
+// Services.yaml override. ??= leaves an XCLASS the site registered itself in place.
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][ExtbaseImageService::class] ??= ['className' => ImageService::class];
