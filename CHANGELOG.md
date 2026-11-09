@@ -2,6 +2,15 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.0.16](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.15...v1.0.16) (2026-11-09)
+
+### :repeat: Chores
+
+* **deps:** update dependency infection/infection to ^0.35.10 ([04f1017](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/04f101708cc033bf5dc5dbcb69256462594ec76d))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.173-8.5 ([1ae4711](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/1ae4711751822833ecd61667649ccd87bbdfc564))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.172-8.5 ([982bd5c](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/982bd5c2d84c88f12357fa6212d8a7b6ad693f01))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.171-8.5 ([3b6f7c7](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/3b6f7c798828c71d62345167f7a15719cd1c2938))
+
 ## [1.0.15](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.14...v1.0.15) (2026-11-08)
 
 ### :bug: Fixes
