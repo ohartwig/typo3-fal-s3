@@ -22,9 +22,9 @@ URL.
   Kubernetes), static keys from the environment for a local S3, then container
   and instance metadata. There is no field for an access key.
 - **S3 is asked once.** HEAD results, listings and folder existence live in a
-  shared TYPO3 cache (`koh_fal_s3_meta`) with precise invalidation; listings
-  seed the object cache so an indexer run costs one `ListObjectsV2`, not one
-  `HeadObject` per file. Writes carry their metadata through, hashes are cached
+  shared cache (`koh_fal_s3_meta`) with precise invalidation, which a
+  deployment's `cache:flush` does not empty; listings seed the object cache so
+  an indexer run costs one `ListObjectsV2`, not one `HeadObject` per file. Writes carry their metadata through, hashes are cached
   per ETag forever, `md5` comes from the ETag without a request.
 - **Replicas do not overwrite each other.** New objects are written with
   `If-None-Match: *`. Two pods rendering the same processed variant both
@@ -103,16 +103,54 @@ streams (or redirects, see `streamMode`).
 
 ## Cache backend
 
-`koh_fal_s3_meta` defaults to the database backend so every replica shares one
-cache without extra infrastructure. In production point it at Redis/Valkey:
+The metadata cache `koh_fal_s3_meta` is **not** a CacheManager cache. Its
+entries describe S3 objects (exists, size, mtime, ETag, listings), not code or
+rendered output, so `cache:flush` (any group), "Flush all caches" in the
+backend and `CacheManager::flushCaches()` leave it alone. Before 1.2 every
+deployment's `cache:flush` emptied it, and the first render of each page with
+images then issued one `HeadObject` per processed variant, one after the other.
+
+What keeps it correct is unchanged: the driver invalidates its own writes
+across replicas, every key contains the bucket, and `cacheLifetime` (24 h) and
+`negativeCacheLifetime` (60 s) bound how long a change made outside TYPO3 goes
+unnoticed. To forget everything at once:
 
 ```bash
-TYPO3__SYS__caching__cacheConfigurations__koh_fal_s3_meta__backend=TYPO3\CMS\Core\Cache\Backend\RedisBackend
-TYPO3__SYS__caching__cacheConfigurations__koh_fal_s3_meta__options__hostname=valkey
+vendor/bin/typo3 koh_fal_s3:metadata:flush
 ```
 
-A `TransientMemoryBackend` works but turns every request into a fresh set of
-S3 calls; use it only in tests.
+The cache is shared, so one run reaches every replica. Run it after changing
+bucket contents behind TYPO3's back, not as part of a deployment. There is
+deliberately no hook on the backend's "Flush all caches": editors press it for
+page and template changes, and it would bring the burst of `HeadObject`
+requests back each time.
+
+The configuration has the shape of a `cacheConfigurations` entry and sits next
+to it, at `$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['koh_fal_s3_meta']`.
+It defaults to the database backend (tables `cache_koh_fal_s3_meta` and
+`cache_koh_fal_s3_meta_tags`, declared by the extension), so every replica
+shares one cache without extra infrastructure. In production point it at
+Redis/Valkey:
+
+```bash
+TYPO3__SYS__caching__koh_fal_s3_meta__backend=TYPO3\CMS\Core\Cache\Backend\RedisBackend
+TYPO3__SYS__caching__koh_fal_s3_meta__options__hostname=valkey
+TYPO3__SYS__caching__koh_fal_s3_meta__options__database=12
+```
+
+The pre-1.2 location still works: an entry under
+`SYS/caching/cacheConfigurations/koh_fal_s3_meta` (for example
+`TYPO3__SYS__caching__cacheConfigurations__koh_fal_s3_meta__backend`) is moved
+out of `cacheConfigurations` when the extension loads and merged under the new
+key, which wins field by field. Use one of the two, not both. `groups` has no
+meaning any more and is dropped.
+
+Frontend and backend are built the way TYPO3's CacheManager builds them, so
+every backend option works as it does there. Give a Redis/Valkey backend a
+database of its own or a `keyPrefix`: `RedisBackend::flush()` without a prefix
+is a `FLUSHDB`, and flushing any other cache that shares the database would
+empty this one too. A `TransientMemoryBackend` works but turns every request
+into a fresh set of S3 calls; use it only in tests.
 
 ## IAM
 
