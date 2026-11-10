@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Koh\FalS3\Driver;
 
 use Koh\FalS3\Cache\MetadataCache;
+use Koh\FalS3\Cache\MetadataCacheFactory;
 use Koh\FalS3\Configuration\DriverConfiguration;
 use Koh\FalS3\Metrics\RequestCounter;
 use Koh\FalS3\S3\CacheControlPolicy;
@@ -18,11 +19,7 @@ use Koh\FalS3\S3\ContentTypeResolver;
 use Koh\FalS3\S3\ObjectStore;
 use Koh\FalS3\Security\MalwareScanGate;
 use Psr\Log\LoggerInterface;
-use TYPO3\CMS\Core\Cache\Backend\TransientMemoryBackend;
-use TYPO3\CMS\Core\Cache\CacheManager;
-use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
-use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -35,13 +32,15 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class DriverRuntimeFactory
 {
-    public const CACHE_IDENTIFIER = 'koh_fal_s3_meta';
+    public const CACHE_IDENTIFIER = MetadataCacheFactory::IDENTIFIER;
 
     private readonly ClientFactory $clientFactory;
+    private readonly MetadataCacheFactory $cacheFactory;
 
-    public function __construct(?ClientFactory $clientFactory = null)
+    public function __construct(?ClientFactory $clientFactory = null, ?MetadataCacheFactory $cacheFactory = null)
     {
         $this->clientFactory = $clientFactory ?? new ClientFactory();
+        $this->cacheFactory = $cacheFactory ?? new MetadataCacheFactory();
     }
 
     public function create(DriverConfiguration $configuration, int $storageUid): DriverRuntime
@@ -49,7 +48,7 @@ class DriverRuntimeFactory
         $logger = $this->logger();
         $counter = new RequestCounter($this->metricsLogger(), $configuration->bucket);
         $store = new ObjectStore($this->clientFactory->create($configuration, $logger), $configuration->bucket, $counter, $logger);
-        $cache = new MetadataCache($this->cacheFrontend($logger), $configuration->bucket, $configuration->cacheLifetime, $configuration->negativeCacheLifetime, $counter);
+        $cache = new MetadataCache($this->cacheFrontend(), $configuration->bucket, $configuration->cacheLifetime, $configuration->negativeCacheLifetime, $counter);
         $mapper = new IdentifierMapper($configuration->keyPrefix, $configuration->excludedPrefixes);
         $policy = new CacheControlPolicy($configuration->cacheControlDefault, $configuration->cacheControlProcessed);
         $types = new ContentTypeResolver();
@@ -70,17 +69,13 @@ class DriverRuntimeFactory
         );
     }
 
-    protected function cacheFrontend(LoggerInterface $logger): FrontendInterface
+    /**
+     * Built by MetadataCacheFactory, not fetched from the CacheManager: a
+     * deployment's `cache:flush` must not empty it.
+     */
+    protected function cacheFrontend(): FrontendInterface
     {
-        try {
-            return GeneralUtility::makeInstance(CacheManager::class)->getCache(self::CACHE_IDENTIFIER);
-        } catch (NoSuchCacheException) {
-            $logger->warning('Cache "koh_fal_s3_meta" is not configured; falling back to a per-request memory cache, so every request asks S3 again.');
-            $backend = new TransientMemoryBackend();
-            $frontend = new VariableFrontend(self::CACHE_IDENTIFIER, $backend);
-            $backend->setCache($frontend);
-            return $frontend;
-        }
+        return $this->cacheFactory->frontend();
     }
 
     protected function logger(): LoggerInterface

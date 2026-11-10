@@ -28,6 +28,11 @@ services:
   Koh\FalS3\Configuration\ConfigurationResolver:
     public: true
 
+  # One instance per container, so one backend connection per process. Built
+  # outside the CacheManager on purpose (see the class).
+  Koh\FalS3\Cache\MetadataCacheFactory:
+    public: true
+
   # PSR-15 middlewares are fetched from the container by the middleware dispatcher.
   Koh\FalS3\Runtime\FinishRequestMiddleware:
     public: true

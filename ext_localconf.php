@@ -7,11 +7,9 @@
 
 declare(strict_types=1);
 
-use Koh\FalS3\Driver\DriverRuntimeFactory;
+use Koh\FalS3\Cache\MetadataCacheFactory;
 use Koh\FalS3\Driver\S3Driver;
 use Koh\FalS3\Imaging\ImageService;
-use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
-use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 use TYPO3\CMS\Extbase\Service\ImageService as ExtbaseImageService;
 
 defined('TYPO3') or die();
@@ -26,16 +24,14 @@ $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['registeredDrivers'][S3Driver::SHORT_N
     'flexFormDS' => 'FILE:EXT:koh_fal_s3/Configuration/FlexForm/S3DriverFlexForm.xml',
 ];
 
-// Shared metadata cache. The database backend is the safe default: every replica
-// sees one cache without extra infrastructure. Production points it at Valkey via
-// TYPO3__SYS__caching__cacheConfigurations__koh_fal_s3_meta__backend; ??= keeps
-// that override intact.
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'][DriverRuntimeFactory::CACHE_IDENTIFIER] ??= [
-    'frontend' => VariableFrontend::class,
-    'backend' => Typo3DatabaseBackend::class,
-    'options' => ['defaultLifetime' => 86400],
-    'groups' => ['system'],
-];
+// Shared metadata cache, deliberately not registered with the CacheManager: a
+// deployment's cache:flush would empty it and the next render of every page would
+// HEAD each processed image again (Classes/Cache/MetadataCacheFactory.php). Its
+// configuration lives at SYS/caching/koh_fal_s3_meta; an entry still under
+// cacheConfigurations (TYPO3__SYS__caching__cacheConfigurations__koh_fal_s3_meta__*)
+// is moved there and merged, so existing overrides keep working.
+// koh_fal_s3:metadata:flush empties it.
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching'] = MetadataCacheFactory::relocate($GLOBALS['TYPO3_CONF_VARS']['SYS']['caching'] ?? []);
 
 // Extbase's ImageService downloads every processed image to register it with the
 // AssetCollector; ours skips that for S3 storages (Classes/Imaging/ImageService.php).
