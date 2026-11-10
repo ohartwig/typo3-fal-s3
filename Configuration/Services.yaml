@@ -27,3 +27,7 @@ services:
 
   Koh\FalS3\Configuration\ConfigurationResolver:
     public: true
+
+  # PSR-15 middlewares are fetched from the container by the middleware dispatcher.
+  Koh\FalS3\Runtime\FinishRequestMiddleware:
+    public: true

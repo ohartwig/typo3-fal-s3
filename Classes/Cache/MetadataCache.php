@@ -12,6 +12,8 @@ namespace Koh\FalS3\Cache;
 use Koh\FalS3\Driver\Entry;
 use Koh\FalS3\Driver\KeyPaths;
 use Koh\FalS3\Metrics\RequestCounter;
+use Koh\FalS3\Runtime\EndOfRequest;
+use Koh\FalS3\Runtime\Finishable;
 use Koh\FalS3\S3\ObjectMetadata;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 
@@ -32,8 +34,15 @@ use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
  *
  * invalidateWrite(key): drop obj_<key>, flush folder_<parent(key)>, flush
  * rlist_<A> for every ancestor A of parent(key) including the root.
+ *
+ * The memo ends with the HTTP request (see EndOfRequest), also in a worker
+ * server that keeps this object across requests: a memo that outlived its
+ * request would miss other replicas' invalidations and grow without bound.
+ *
+ * Every lookup counts as hit or miss on the RequestCounter, and the time spent
+ * in the shared cache is added to its cache_ms.
  */
-final class MetadataCache
+final class MetadataCache implements Finishable
 {
     /** @var array<string, mixed> */
     private array $memo = [];
@@ -44,7 +53,9 @@ final class MetadataCache
         private readonly int $lifetime,
         private readonly int $negativeLifetime,
         private readonly ?RequestCounter $counter = null,
-    ) {}
+    ) {
+        EndOfRequest::register($this);
+    }
 
     public function object(string $key): ?ObjectMetadata
     {
@@ -76,7 +87,9 @@ final class MetadataCache
     {
         $id = CacheKeys::object($this->bucket, $key);
         unset($this->memo[$id]);
+        $started = $this->counter?->startTimer();
         $this->cache->remove($id);
+        $this->counter?->cacheDone($started);
     }
 
     /**
@@ -156,6 +169,7 @@ final class MetadataCache
     public function invalidateWrite(string $key): void
     {
         $this->memo = [];
+        $started = $this->counter?->startTimer();
         $this->cache->remove(CacheKeys::object($this->bucket, $key));
         $parent = KeyPaths::parent($key);
         $tags = [CacheKeys::folderTag($this->bucket, $parent)];
@@ -163,6 +177,7 @@ final class MetadataCache
             $tags[] = CacheKeys::recursiveTag($this->bucket, $ancestor);
         }
         $this->cache->flushByTags(array_values(array_unique($tags)));
+        $this->counter?->cacheDone($started);
     }
 
     /**
@@ -179,8 +194,10 @@ final class MetadataCache
         foreach (KeyPaths::ancestors($prefix) as $ancestor) {
             $tags[] = CacheKeys::recursiveTag($this->bucket, $ancestor);
         }
+        $started = $this->counter?->startTimer();
         $this->cache->remove(CacheKeys::folderExists($this->bucket, $prefix));
         $this->cache->flushByTags(array_values(array_unique($tags)));
+        $this->counter?->cacheDone($started);
     }
 
     public function forgetMemo(): void
@@ -188,13 +205,20 @@ final class MetadataCache
         $this->memo = [];
     }
 
+    public function finish(): void
+    {
+        $this->forgetMemo();
+    }
+
     private function read(string $id): mixed
     {
         if (array_key_exists($id, $this->memo)) {
-            $this->counter?->cacheHit();
+            $this->counter?->cacheHit(true);
             return $this->memo[$id];
         }
+        $started = $this->counter?->startTimer();
         $value = $this->cache->get($id);
+        $this->counter?->cacheDone($started);
         if ($value === false) {
             $this->counter?->cacheMiss();
             return null;
@@ -209,6 +233,8 @@ final class MetadataCache
     private function write(string $id, mixed $value, array $tags, int $lifetime): void
     {
         $this->memo[$id] = $value;
+        $started = $this->counter?->startTimer();
         $this->cache->set($id, $value, $tags, $lifetime === 0 ? null : $lifetime);
+        $this->counter?->cacheDone($started);
     }
 }
