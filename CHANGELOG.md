@@ -2,6 +2,12 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.1.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.16...v1.1.0) (2026-11-10)
+
+### :sparkles: Features
+
+* **metrics:** write the S3 metrics line once per HTTP request, with timings ([6d32c46](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/6d32c46f9bc0d9888c606a23e03dfcb838c1d788))
+
 ## [1.0.16](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.15...v1.0.16) (2026-11-09)
 
 ### :repeat: Chores
