@@ -27,10 +27,11 @@ use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Resource\Exception\FileDoesNotExistException;
 
 /**
- * The only class that talks to S3. Every method counts its request, maps the
- * SDK's exceptions to the driver's, and never swallows one: a missing object
- * is a value (ObjectMetadata::missing()), everything else is an exception
- * with the operation, the key and the HTTP status in it.
+ * The only class that talks to S3. Every method counts and times its request
+ * (see RequestCounter), maps the SDK's exceptions to the driver's, and never
+ * swallows one: a missing object is a value (ObjectMetadata::missing()),
+ * everything else is an exception with the operation, the key and the HTTP
+ * status in it.
  */
 class ObjectStore
 {
@@ -53,7 +54,7 @@ class ObjectStore
 
     public function head(string $key): ObjectMetadata
     {
-        $this->counter->request('HeadObject', $key);
+        $started = $this->counter->request('HeadObject', $key);
         try {
             $output = $this->client->headObject(['Bucket' => $this->bucket, 'Key' => $key]);
             $output->resolve();
@@ -62,6 +63,8 @@ class ObjectStore
             return ObjectMetadata::missing();
         } catch (AsyncAwsException $e) {
             $this->fail('HeadObject', $key, $e);
+        } finally {
+            $this->counter->requestDone('HeadObject', $started);
         }
     }
 
@@ -70,7 +73,7 @@ class ObjectStore
      */
     public function list(string $prefix, bool $recursive): array
     {
-        $this->counter->request('ListObjectsV2');
+        $started = $this->counter->request('ListObjectsV2');
         $input = ['Bucket' => $this->bucket, 'Prefix' => $prefix];
         if (!$recursive) {
             $input['Delimiter'] = '/';
@@ -88,6 +91,8 @@ class ObjectStore
             }
         } catch (AsyncAwsException $e) {
             $this->fail('ListObjectsV2', $prefix, $e);
+        } finally {
+            $this->counter->requestDone('ListObjectsV2', $started);
         }
         return ['objects' => $objects, 'prefixes' => $prefixes];
     }
@@ -98,7 +103,7 @@ class ObjectStore
      */
     public function prefixHasAnything(string $prefix): bool
     {
-        $this->counter->request('ListObjectsV2');
+        $started = $this->counter->request('ListObjectsV2');
         try {
             $output = $this->client->listObjectsV2(['Bucket' => $this->bucket, 'Prefix' => $prefix, 'MaxKeys' => 1]);
             foreach ($output->getContents(true) as $ignored) {
@@ -107,6 +112,8 @@ class ObjectStore
             return false;
         } catch (AsyncAwsException $e) {
             $this->fail('ListObjectsV2', $prefix, $e);
+        } finally {
+            $this->counter->requestDone('ListObjectsV2', $started);
         }
     }
 
@@ -115,7 +122,7 @@ class ObjectStore
      */
     public function isPrefixEmpty(string $prefix): bool
     {
-        $this->counter->request('ListObjectsV2');
+        $started = $this->counter->request('ListObjectsV2');
         try {
             $output = $this->client->listObjectsV2(['Bucket' => $this->bucket, 'Prefix' => $prefix, 'Delimiter' => '/', 'MaxKeys' => 2]);
             foreach ($output->getContents(true) as $object) {
@@ -129,6 +136,8 @@ class ObjectStore
             return true;
         } catch (AsyncAwsException $e) {
             $this->fail('ListObjectsV2', $prefix, $e);
+        } finally {
+            $this->counter->requestDone('ListObjectsV2', $started);
         }
     }
 
@@ -137,7 +146,7 @@ class ObjectStore
      */
     public function get(string $key, ?string $range = null): GetObjectOutput
     {
-        $this->counter->request('GetObject', $key);
+        $started = $this->counter->request('GetObject', $key);
         $input = ['Bucket' => $this->bucket, 'Key' => $key];
         if ($range !== null) {
             $input['Range'] = $range;
@@ -153,6 +162,8 @@ class ObjectStore
             throw new ObjectArchivedException($key, null, $e);
         } catch (AsyncAwsException $e) {
             $this->fail('GetObject', $key, $e);
+        } finally {
+            $this->counter->requestDone('GetObject', $started);
         }
     }
 
@@ -163,6 +174,7 @@ class ObjectStore
         if ($handle === false) {
             throw new S3OperationFailedException(sprintf('Cannot open "%s" for writing.', $localPath), 1760400021, 'GetObject', $key);
         }
+        $started = $this->counter->startTimer();
         try {
             foreach ($output->getBody()->getChunks() as $chunk) {
                 fwrite($handle, $chunk);
@@ -170,6 +182,9 @@ class ObjectStore
         } catch (AsyncAwsException $e) {
             fclose($handle);
             $this->fail('GetObject', $key, $e);
+        } finally {
+            // The body belongs to the GetObject counted in get().
+            $this->counter->requestDone('GetObject', $started);
         }
         fclose($handle);
         return new ObjectMetadata(
@@ -193,9 +208,11 @@ class ObjectStore
         if ($handle === false) {
             throw new S3OperationFailedException(sprintf('Local file "%s" cannot be opened.', $localPath), 1760400023, 'PutObject', $key);
         }
+        $operation = $size < self::SMALL_UPLOAD_LIMIT ? 'PutObject' : 'MultipartUpload';
+        $started = $this->counter->request($operation);
+        $etag = null;
         try {
-            if ($size < self::SMALL_UPLOAD_LIMIT) {
-                $this->counter->request('PutObject');
+            if ($operation === 'PutObject') {
                 $input = [
                     'Bucket' => $this->bucket,
                     'Key' => $key,
@@ -213,17 +230,20 @@ class ObjectStore
             } else {
                 // SimpleS3Client::upload() knows no If-None-Match; a multipart-sized
                 // object is never a processed file, so the race it guards does not arise.
-                $this->counter->request('MultipartUpload');
                 $this->client->upload($this->bucket, $key, $handle, [
                     'ContentType' => $options->contentType,
                     'CacheControl' => $options->cacheControl,
                     'ContentLength' => $size,
                 ]);
-                $etag = $this->head($key)->etag;
             }
         } catch (AsyncAwsException $e) {
             fclose($handle);
             $this->failWrite('PutObject', $key, $e);
+        } finally {
+            $this->counter->requestDone($operation, $started);
+        }
+        if ($operation === 'MultipartUpload') {
+            $etag = $this->head($key)->etag;
         }
         fclose($handle);
         return new ObjectMetadata(true, $size, time(), $etag, $options->contentType, null, false);
@@ -231,7 +251,7 @@ class ObjectStore
 
     public function putString(string $key, string $body, UploadOptions $options): ObjectMetadata
     {
-        $this->counter->request('PutObject');
+        $started = $this->counter->request('PutObject');
         try {
             $input = [
                 'Bucket' => $this->bucket,
@@ -249,6 +269,8 @@ class ObjectStore
             $etag = $output->getEtag();
         } catch (AsyncAwsException $e) {
             $this->failWrite('PutObject', $key, $e);
+        } finally {
+            $this->counter->requestDone('PutObject', $started);
         }
         return new ObjectMetadata(true, strlen($body), time(), $etag, $options->contentType, null, false);
     }
@@ -263,7 +285,7 @@ class ObjectStore
         if ($size > self::MULTIPART_COPY_THRESHOLD) {
             return $this->multipartCopy($sourceKey, $targetKey, $size, $options);
         }
-        $this->counter->request('CopyObject');
+        $started = $this->counter->request('CopyObject');
         try {
             $output = $this->client->copyObject([
                 'Bucket' => $this->bucket,
@@ -290,18 +312,22 @@ class ObjectStore
             throw new ObjectArchivedException($sourceKey, null, $e);
         } catch (AsyncAwsException $e) {
             $this->fail('CopyObject', $sourceKey . ' -> ' . $targetKey, $e);
+        } finally {
+            $this->counter->requestDone('CopyObject', $started);
         }
     }
 
     public function delete(string $key): void
     {
-        $this->counter->request('DeleteObject');
+        $started = $this->counter->request('DeleteObject');
         try {
             $this->client->deleteObject(['Bucket' => $this->bucket, 'Key' => $key])->resolve();
         } catch (NoSuchKeyException) {
             // Deleting what is not there is the outcome we wanted.
         } catch (AsyncAwsException $e) {
             $this->fail('DeleteObject', $key, $e);
+        } finally {
+            $this->counter->requestDone('DeleteObject', $started);
         }
     }
 
@@ -311,7 +337,7 @@ class ObjectStore
     public function deleteMany(array $keys): void
     {
         foreach (array_chunk($keys, self::DELETE_BATCH) as $batch) {
-            $this->counter->request('DeleteObjects');
+            $started = $this->counter->request('DeleteObjects');
             try {
                 $output = $this->client->deleteObjects([
                     'Bucket' => $this->bucket,
@@ -333,6 +359,8 @@ class ObjectStore
                 }
             } catch (AsyncAwsException $e) {
                 $this->fail('DeleteObjects', $batch[0], $e);
+            } finally {
+                $this->counter->requestDone('DeleteObjects', $started);
             }
         }
     }
@@ -342,7 +370,7 @@ class ObjectStore
      */
     public function tags(string $key): array
     {
-        $this->counter->request('GetObjectTagging');
+        $started = $this->counter->request('GetObjectTagging');
         try {
             $output = $this->client->getObjectTagging(['Bucket' => $this->bucket, 'Key' => $key]);
             $output->resolve();
@@ -355,6 +383,8 @@ class ObjectStore
             return [];
         } catch (AsyncAwsException $e) {
             $this->fail('GetObjectTagging', $key, $e);
+        } finally {
+            $this->counter->requestDone('GetObjectTagging', $started);
         }
     }
 
@@ -372,7 +402,8 @@ class ObjectStore
 
     private function multipartCopy(string $sourceKey, string $targetKey, int $size, UploadOptions $options): ObjectMetadata
     {
-        $this->counter->request('CreateMultipartUpload');
+        $operation = 'CreateMultipartUpload';
+        $started = $this->counter->request($operation);
         $uploadId = null;
         try {
             $created = $this->client->createMultipartUpload([
@@ -382,12 +413,15 @@ class ObjectStore
                 'CacheControl' => $options->cacheControl,
             ]);
             $created->resolve();
+            $this->counter->requestDone($operation, $started);
+            $started = null;
             $uploadId = (string)$created->getUploadId();
             $parts = [];
             $partNumber = 1;
             for ($start = 0; $start < $size; $start += self::MULTIPART_COPY_PART_SIZE) {
                 $end = min($size - 1, $start + self::MULTIPART_COPY_PART_SIZE - 1);
-                $this->counter->request('UploadPartCopy');
+                $operation = 'UploadPartCopy';
+                $started = $this->counter->request($operation);
                 $part = $this->client->uploadPartCopy([
                     'Bucket' => $this->bucket,
                     'Key' => $targetKey,
@@ -397,21 +431,32 @@ class ObjectStore
                     'CopySourceRange' => sprintf('bytes=%d-%d', $start, $end),
                 ]);
                 $part->resolve();
+                $this->counter->requestDone($operation, $started);
+                $started = null;
                 $parts[] = ['ETag' => (string)$part->getCopyPartResult()?->getEtag(), 'PartNumber' => $partNumber];
                 $partNumber++;
             }
-            $this->counter->request('CompleteMultipartUpload');
+            $operation = 'CompleteMultipartUpload';
+            $started = $this->counter->request($operation);
             $this->client->completeMultipartUpload([
                 'Bucket' => $this->bucket,
                 'Key' => $targetKey,
                 'UploadId' => $uploadId,
                 'MultipartUpload' => ['Parts' => $parts],
             ])->resolve();
+            $this->counter->requestDone($operation, $started);
+            $started = null;
         } catch (AsyncAwsException $e) {
+            $this->counter->requestDone($operation, $started);
+            $started = null;
             if ($uploadId !== null) {
                 try {
-                    $this->counter->request('AbortMultipartUpload');
-                    $this->client->abortMultipartUpload(['Bucket' => $this->bucket, 'Key' => $targetKey, 'UploadId' => $uploadId])->resolve();
+                    $aborting = $this->counter->request('AbortMultipartUpload');
+                    try {
+                        $this->client->abortMultipartUpload(['Bucket' => $this->bucket, 'Key' => $targetKey, 'UploadId' => $uploadId])->resolve();
+                    } finally {
+                        $this->counter->requestDone('AbortMultipartUpload', $aborting);
+                    }
                 } catch (AsyncAwsException $abortFailure) {
                     $this->logger->error('Aborting a failed multipart copy failed too; the bucket lifecycle cleans it up', ['key' => $targetKey, 'error' => $abortFailure->getMessage()]);
                 }

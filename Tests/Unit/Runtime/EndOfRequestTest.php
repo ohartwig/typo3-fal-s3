@@ -72,21 +72,26 @@ final class EndOfRequestTest extends UnitTestCase
 
         self::assertSame([
             'bucket' => 'bucket',
+            'host' => '',
+            'path' => '',
             'requests' => ['HeadObject' => 1],
             'total' => 1,
+            's3_ms' => 0.0,
+            's3_ms_by_operation' => [],
             'cache_hits' => 0,
+            'memo_hits' => 0,
             'cache_misses' => 0,
+            'cache_ms' => 0.0,
             'keys' => ['HeadObject' => ['x' => 1]],
             'keys_dropped' => 0,
         ], $counter->snapshot());
     }
 
     #[Test]
-    public function aCounterWithoutRequestsLogsNothing(): void
+    public function aCounterWithNothingCountedLogsNothing(): void
     {
         $logger = $this->recordingLogger();
         $counter = new RequestCounter($logger, 'bucket');
-        $counter->cacheHit();
         unset($counter);
 
         self::assertSame([], $logger->records);

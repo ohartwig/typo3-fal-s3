@@ -147,15 +147,24 @@ own XCLASS for `ImageService` keeps it and does not get this.
 
 ## Metrics
 
-Every request that reached S3 writes one `info` line ("S3 requests for this
-request") to the log channel `Koh.FalS3.Metrics`, with the S3 requests per
-operation and the cache hit/miss count. For `GetObject` and `HeadObject` it also
-lists the object keys (up to 25 per operation, `keys_dropped` counts the rest),
-so a slow render can be traced to the files it fetched. The line is written when
-the request's driver objects go away, which in a worker server (FrankenPHP,
-RoadRunner) is the end of each request, not the end of the worker process. Route
-it to a file or JSON writer to compare request volume with whatever the storage
-replaced:
+Every HTTP request that touched the storage writes one `info` line ("S3
+requests for this request") to the log channel `Koh.FalS3.Metrics`: the request's
+host and path (no query string), the S3 requests per operation, the time spent
+in them (`s3_ms`, and per operation in `s3_ms_by_operation`), the metadata-cache
+hits (`memo_hits` of them from the in-process memo), misses and the time spent in
+the shared cache (`cache_ms`). A request served entirely from the cache writes a
+line too, with `total` 0. For `GetObject` and `HeadObject` the line also lists
+the object keys (up to 25 per operation, `keys_dropped` counts the rest), so a
+slow render can be traced to the files it fetched. All fields are listed in
+`Classes/Metrics/RequestCounter.php`.
+
+A middleware placed outermost in the frontend and backend stacks writes the line
+when the request has been handled, so a worker server (FrankenPHP, RoadRunner)
+writes one line per request even when it keeps the container and the driver
+objects between requests. On the CLI the line is written when the driver objects
+go away or the process ends. Nothing is timed or written unless the channel has
+a writer for `INFO`. Route it to a file or JSON writer to compare request volume
+with whatever the storage replaced:
 
 ```php
 $GLOBALS['TYPO3_CONF_VARS']['LOG']['Koh']['FalS3']['Metrics']['writerConfiguration'] = [

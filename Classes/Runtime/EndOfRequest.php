@@ -18,7 +18,9 @@ namespace Koh\FalS3\Runtime;
  * driver runtime, S3 client included, until the worker exits, and run all of
  * their clean-up in one burst at that moment. Objects that register here
  * finish from their destructor instead: once the worker drops the request's
- * container, they finish with it.
+ * container, they finish with it. A worker that keeps the container between
+ * requests (persistent bootstrap) keeps these objects too; for that case
+ * FinishRequestMiddleware calls finishAll() at the end of every HTTP request.
  *
  * One process-wide shutdown hook remains as a fallback for objects still alive
  * when the process ends; after a fatal error PHP does not call destructors.

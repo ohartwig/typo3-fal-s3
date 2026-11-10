@@ -15,9 +15,12 @@ final class RecordingLogger extends AbstractLogger
 {
     /** @var list<string> */
     public array $records = [];
+    /** @var list<array<mixed>> */
+    public array $contexts = [];
 
     public function log($level, \Stringable|string $message, array $context = []): void
     {
         $this->records[] = (string)$message;
+        $this->contexts[] = $context;
     }
 }
