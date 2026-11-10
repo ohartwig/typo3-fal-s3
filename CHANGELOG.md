@@ -2,6 +2,12 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.2.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.1.0...v1.2.0) (2026-11-10)
+
+### :sparkles: Features
+
+* **cache:** keep the S3 metadata cache out of the CacheManager so cache:flush leaves it warm ([8eb34f4](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/8eb34f40a87735aef49fef521c6723aaa7357eb4))
+
 ## [1.1.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.0.16...v1.1.0) (2026-11-10)
 
 ### :sparkles: Features
