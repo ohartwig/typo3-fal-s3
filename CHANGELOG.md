@@ -2,6 +2,17 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.2.1](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.2.0...v1.2.1) (2026-11-16)
+
+### :repeat: Continuous Integrations
+
+* **deps:** update registry.ole-hartwig.eu/devops/ci-mirrors/rustfs docker tag to v1.0.5 ([1bb9e56](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/1bb9e56f85c45050bd74da0aa970dae7a3e1b8af))
+
+### :repeat: Chores
+
+* **deps:** update dependency infection/infection to ^0.35.11 ([4ede049](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/4ede049813388e06f272c240acf00d86f14369d3))
+* **deps:** update dependency registry.ole-hartwig.eu/devops/images/franken-php/ci to v3.2.246-8.5 ([2708f93](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/2708f9317eb3e90f7da0054572ece90a5fee7d06))
+
 ## [1.2.0](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.1.0...v1.2.0) (2026-11-10)
 
 ### :sparkles: Features
