@@ -2,6 +2,12 @@
 
 All notable changes are recorded here by the release tooling.
 
+## [1.2.5](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.2.4...v1.2.5) (2026-11-20)
+
+### :repeat: Chores
+
+* **deps:** update dependency phpstan/phpstan to ^2.3.7 ([e023670](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/commit/e02367071253c23218f83112b4f31b8a79cf4bd2))
+
 ## [1.2.4](https://git.ole-hartwig.eu/ai-ready-platform/platform/typo3-fal-s3/compare/v1.2.3...v1.2.4) (2026-11-18)
 
 ### :repeat: Continuous Integrations
